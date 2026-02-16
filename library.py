@@ -1,4 +1,6 @@
 import os
+from email.policy import default
+
 from book import Book
 
 class Library:
@@ -19,10 +21,10 @@ class Library:
         with open(self.file_name, "r") as f:
             for line in f:
                 line = line.strip()
-                print(line)
                 if line:
                     if ";" in line:
                         title, author, count = line.rsplit(";",2 )
+                        print("Loading:")
                         print(title, author, count)
                         self.storage.update({title: {"author": author,
                                                      "count": int(count)
@@ -50,6 +52,7 @@ class Library:
             print(f"{book}, {self.storage[book]}")
         print(f"\n{self.storage=}")
 
+
     # Saving book Name and number of books to file
     def save_storage(self):
         with open(self.file_name, "w") as f:
@@ -61,3 +64,18 @@ class Library:
                 count = info["count"]
                 f.write(f"{title};{author};{count}\n")
                 # print(book.title)
+
+
+    def borrow_book(self):
+        book_name = input("Book name: ")
+        amount = input("Amount: ")
+        if amount:
+            amount = int(amount)
+            pass
+        else:
+            amount = 1
+        # book_count = self.storage[book_name]["count"]
+        if book_name in self.storage and self.storage[book_name]["count"] > 0:
+            print(f"Old number of {book_name} in storage: {self.storage[book_name]["count"]}.")
+            self.storage[book_name]["count"] -= amount
+            print(f"{book_name} was successfully borrowed. Books left in storage: {self.storage[book_name]["count"]}.")
