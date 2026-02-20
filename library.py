@@ -1,3 +1,4 @@
+### Library
 import os
 from email.policy import default
 
@@ -12,12 +13,12 @@ class Library:
     def testing_something():
         print("---")
 
+
     def load_file_and_save_to_storage(self):
         # Check if file exists so we don't crash
         if not os.path.exists(self.file_name):
             print("No saved data found. Starting fresh.")
             return
-
         with open(self.file_name, "r") as f:
             for line in f:
                 line = line.strip()
@@ -31,6 +32,7 @@ class Library:
                                                      }})
                 print("------------------------------")
         print(f"Loaded {len(self.storage)} unique titles.")
+
 
     def store_book(self, book_obj: Book):
         # Checking if the book is already in storage
@@ -53,29 +55,72 @@ class Library:
         print(f"\n{self.storage=}")
 
 
+    def borrow_book(self):
+        while True:
+            book_name_input = input("Book you want to borrow: ").strip()
+
+            if book_name_input not in self.storage:
+                print(f"❌ {book_name_input} was not found in library.")
+                return
+
+            book_data = self.storage[book_name_input]
+            print(f"Available books: {book_data["count"]}.")
+
+            while True:
+                try:
+                    book_amount_input = input(f"Number of books to borrow: ").strip()
+                    amount = int(book_amount_input) if book_amount_input else 1
+
+                    if amount <= 0:
+                        print("⚠️ Please enter a positive number:.")
+                        continue
+
+                    if amount > book_data["count"]:
+                        print(f"⚠️ Please enter a lower number. {book_data["count"]} books available.")
+                        continue
+
+
+                    print(f"Borrowing {amount} {book_name_input} books?")
+                    confirmation = input("Please confirm (y/n): ").lower()
+                    if confirmation == "y":
+                        book_data["count"] -= amount
+                        print(f"✅ {amount} {book_name_input} books were successfully borrowed. ")
+                        break
+                    elif confirmation == "n":
+                        print("0 book borrowed. Exiting.")
+                        break
+
+                except ValueError:
+                    print("❌ Please type a whole number.")
+
+            add_more_book = input("Add more books? y/n: ").lower()
+            if add_more_book == "y":
+                continue
+
+            elif add_more_book == "n":
+                return
+
+
     # Saving book Name and number of books to file
     def save_storage(self):
-        with open(self.file_name, "w") as f:
-            # for book in self.storage:
-            #     f.write(f"{book};{self.storage[book]["author"]};{self.storage[book]["count"]}\n")
-            #     # print(book.title)
-            for title, info in self.storage.items():
-                author = info["author"]
-                count = info["count"]
-                f.write(f"{title};{author};{count}\n")
-                # print(book.title)
+        temp_file = self.file_name + ".tmp"
+        backup_file = self.file_name + ".bak"
 
+        try:
+            # 1. Write to a TEMPORARY file first
+            with open(temp_file, "w") as f:
+                for title, info in self.storage.items():
+                    f.write(f"{title};{info['author']};{info['count']}\n")
 
-    def borrow_book(self):
-        book_name = input("Book name: ")
-        amount = input("Amount: ")
-        if amount:
-            amount = int(amount)
-            pass
-        else:
-            amount = 1
-        # book_count = self.storage[book_name]["count"]
-        if book_name in self.storage and self.storage[book_name]["count"] > 0:
-            print(f"Old number of {book_name} in storage: {self.storage[book_name]["count"]}.")
-            self.storage[book_name]["count"] -= amount
-            print(f"{book_name} was successfully borrowed. Books left in storage: {self.storage[book_name]["count"]}.")
+            # 2. If writing succeeded, create a backup of the old file
+            if os.path.exists(self.file_name):
+                if os.path.exists(backup_file):
+                    os.remove(backup_file)
+                os.rename(self.file_name, backup_file)
+
+            # 3. Rename the temp file to the real filename
+            os.rename(temp_file, self.file_name)
+            print("✅ Data saved securely.")
+
+        except Exception as e:
+            print(f"❌ Critical Save Error: {e}")
