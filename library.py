@@ -20,18 +20,18 @@ class Library:
             print("No saved data found. Starting fresh.")
             return
         with open(self.file_name, "r") as f:
+            print("Loading:\n")
             for line in f:
                 line = line.strip()
                 if line:
                     if ";" in line:
                         title, author, count = line.rsplit(";",2 )
-                        print("Loading:")
-                        print(title, author, count)
                         self.storage.update({title: {"author": author,
                                                      "count": int(count)
                                                      }})
+                        print(title, self.storage[title])
                 print("------------------------------")
-        print(f"Loaded {len(self.storage)} unique titles.")
+        print(f"Loaded {len(self.storage)} unique titles.\n")
 
 
     def store_book(self, book_obj: Book):
@@ -39,11 +39,12 @@ class Library:
         if book_obj.title in self.storage:
             self.storage[book_obj.title]["count"] += 1
 
-            # print(f"-> Updated the number of stored '{book_obj.title}'\n")
         else:
             self.storage.update({book_obj.title: {"author": book_obj.author,
                                                   "count": 1}})
-            # print(f"-> Stored '{book_obj.title}'\n")
+        print(f"'{book_obj.title}' was added to library.\n"
+              f"Number of books: {self.storage[book_obj.title]["count"]}")
+        print("------------------------------")
 
 
     # Method that prints the book information, together with the number of stored books
@@ -59,9 +60,13 @@ class Library:
         while True:
             book_name_input = input("Book you want to borrow: ").strip()
 
-            if book_name_input not in self.storage:
-                print(f"❌ {book_name_input} was not found in library.")
+            if book_name_input == "x":
+                print("Exiting book borrowing.")
                 return
+
+            elif book_name_input not in self.storage:
+                print(f"❌ '{book_name_input}' was not found in library. Check spelling.")
+                continue
 
             book_data = self.storage[book_name_input]
             print(f"Available books: {book_data["count"]}.")

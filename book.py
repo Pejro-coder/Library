@@ -11,3 +11,7 @@ class Book:
 
     def save_format(self):
         return f"📘 {self.title} | {self.author} | {self.is_available}"
+
+    # def create_book(self):
+    #     input("Book title: ")
+    #     input("Book author: ")
