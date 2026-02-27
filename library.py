@@ -9,9 +9,9 @@ class Library:
         self.storage = {}
         self.file_name = "saved_books.txt"
 
-    @staticmethod
-    def testing_something():
-        print("---")
+    # @staticmethod
+    # def testing_something():
+    #     print("---")
 
 
     def load_file_and_save_to_storage(self):
@@ -26,37 +26,62 @@ class Library:
                 if line:
                     if ";" in line:
                         title, author, count = line.rsplit(";",2 )
-                        self.storage.update({title: {"author": author,
-                                                     "count": int(count)
-                                                     }})
-                        print(title, self.storage[title])
+                        book_obj = Book(title, author, count)
+                        self.storage.update({title: book_obj})
+                        # self.storage.update({title: {"author": author,
+                        #                              "count": int(count)
+                        #                              }})
+                        print(title, book_obj)
                 print("------------------------------")
         print(f"Loaded {len(self.storage)} unique titles.\n")
-
-
-    def store_book(self, book_obj: Book):
-        # Checking if the book is already in storage
-        if book_obj.title in self.storage:
-            self.storage[book_obj.title]["count"] += 1
-
-        else:
-            self.storage.update({book_obj.title: {"author": book_obj.author,
-                                                  "count": 1}})
-        print(f"'{book_obj.title}' was added to library.\n"
-              f"Number of books: {self.storage[book_obj.title]["count"]}")
-        print("------------------------------")
 
 
     # Method that prints the book information, together with the number of stored books
     def show_books(self):
         print("\n--- CURRENT LIBRARY INVENTORY ---")
-        self.testing_something()
         for book in self.storage:
-            print(f"{book}, {self.storage[book]}")
-        print(f"\n{self.storage=}")
+            print(self.storage[book])
+
+
+    def update_storage(self):
+        print("---ADDING BOOKS TO STORAGE---")
+        while True:
+            book_title = input("Book title: ").strip()
+            nb_books = int(input(f"Number of new '{book_title}' books you want to add: "))
+
+            if nb_books <= 0:
+                print("⚠️ Please enter a positive number.")
+                continue
+
+            if book_title in self.storage:
+                # book_obj = Book(book_title, self.storage[book_title]["author"])
+                self.storage[book_title].count += nb_books
+            else:
+                book_author = input("Book_author: ")
+                book_obj = Book(book_title, book_author, nb_books)
+                self.storage.update({book_title: book_obj})
+                # self.storage.update({book_obj.title: {"author": book_obj.author,
+                #                                       "count": nb_books}})
+                print("New book added to library!")
+
+            # Dynamic printing
+            word = "book" if nb_books == 1 else "books"
+            print(f"{nb_books} '{book_title}' {word} added to library.\n"
+                  f"Number of books: {self.storage[book_title].count}")
+            print("------------------------------")
+
+            if input("Do you want to add more books? (y/n) ") != "y":
+                break
+
+
+
+    def return_book(self):
+        pass
+
 
 
     def borrow_book(self):
+        print("---BORROWING BOOKS---")
         while True:
             book_name_input = input("Book you want to borrow: ").strip()
 
@@ -69,7 +94,7 @@ class Library:
                 continue
 
             book_data = self.storage[book_name_input]
-            print(f"Available books: {book_data["count"]}.")
+            print(f"Available books: {book_data.count}.")
 
             while True:
                 try:
@@ -77,18 +102,18 @@ class Library:
                     amount = int(book_amount_input) if book_amount_input else 1
 
                     if amount <= 0:
-                        print("⚠️ Please enter a positive number:.")
+                        print("⚠️ Please enter a positive number.")
                         continue
 
-                    if amount > book_data["count"]:
-                        print(f"⚠️ Please enter a lower number. {book_data["count"]} books available.")
+                    if amount > book_data.count:
+                        print(f"⚠️ Please enter a lower number. {book_data.count} books available.")
                         continue
 
 
                     print(f"Borrowing {amount} {book_name_input} books?")
                     confirmation = input("Please confirm (y/n): ").lower()
                     if confirmation == "y":
-                        book_data["count"] -= amount
+                        book_data.count -= amount
                         print(f"✅ {amount} {book_name_input} books were successfully borrowed. ")
                         break
                     elif confirmation == "n":
@@ -98,15 +123,12 @@ class Library:
                 except ValueError:
                     print("❌ Please type a whole number.")
 
-            add_more_book = input("Add more books? y/n: ").lower()
-            if add_more_book == "y":
-                continue
-
-            elif add_more_book == "n":
+            if input("Borrow more books? y/n: ").lower() != "y":
                 return
 
 
-    # Saving book Name and number of books to file
+
+    # Saving book Name, Author and number of books to file
     def save_storage(self):
         temp_file = self.file_name + ".tmp"
         backup_file = self.file_name + ".bak"
@@ -114,8 +136,8 @@ class Library:
         try:
             # 1. Write to a TEMPORARY file first
             with open(temp_file, "w") as f:
-                for title, info in self.storage.items():
-                    f.write(f"{title};{info['author']};{info['count']}\n")
+                for book_name, book_info in self.storage.items():
+                    f.write(f"{book_info.title};{book_info.author};{book_info.count}\n")
 
             # 2. If writing succeeded, create a backup of the old file
             if os.path.exists(self.file_name):
@@ -129,3 +151,5 @@ class Library:
 
         except Exception as e:
             print(f"❌ Critical Save Error: {e}")
+
+
