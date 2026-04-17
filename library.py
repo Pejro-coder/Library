@@ -42,7 +42,7 @@ class Library:
         for book in self.storage:
             print(self.storage[book])
 
-
+    # This method is used for the "employee" to use when new books are added to the library
     def update_storage(self):
         print("---ADDING BOOKS TO STORAGE---")
         while True:
@@ -74,19 +74,49 @@ class Library:
                 break
 
 
-
+    # Used when a customer wants to return the book
     def return_book(self):
-        pass
+        print("---RETURNING BOOKS---")
+        while True:
+            book_name_input = input("Book you want to return: ").strip()
+
+            if book_name_input == "x":
+                print("Exiting form.")
+                return
+
+            elif book_name_input not in self.storage:
+                print(f"❌ '{book_name_input}' was not found in library. Check spelling.")
+                continue
+
+            while True:
+                book_amount_input = int(input("How many books are you returning: ").strip())
+                if book_amount_input <= 0:
+                    print("⚠️ Please enter a positive number.")
+                    continue
+
+                print(f"Returning {book_amount_input} {book_name_input} books?")
+                confirmation = input("Please confirm (y/n): ").lower()
+                if confirmation == "y":
+                    self.storage[book_name_input].count += book_amount_input
+                    print(f"✅ {book_amount_input} {book_name_input} books were successfully returned. ")
+                    break
+                elif confirmation == "n":
+                    print("0 book borrowed. Exiting.")
+                    break
+
+            if input("Do you want to return more books? (y/n): ").strip() != "y":
+                break
 
 
 
+    # Used when the customer is borrowing a book
     def borrow_book(self):
         print("---BORROWING BOOKS---")
         while True:
             book_name_input = input("Book you want to borrow: ").strip()
 
             if book_name_input == "x":
-                print("Exiting book borrowing.")
+                print("Exiting form")
                 return
 
             elif book_name_input not in self.storage:
