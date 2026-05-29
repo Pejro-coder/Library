@@ -1,77 +1,18 @@
 ### Library
 import os
-from email.policy import default
-
+from storage_manager import StorageManager
 from book import Book
 
+
 class Library:
-    def __init__(self):
-        self.storage = {}
-        self.file_name = "saved_books.txt"
-
-    # @staticmethod
-    # def testing_something():
-    #     print("---")
-
-
-    def load_file_and_save_to_storage(self):
-        # Check if file exists so we don't crash
-        if not os.path.exists(self.file_name):
-            print("No saved data found. Starting fresh.")
-            return
-        with open(self.file_name, "r") as f:
-            print("Loading:\n")
-            for line in f:
-                line = line.strip()
-                if line:
-                    if ";" in line:
-                        title, author, count = line.rsplit(";",2 )
-                        book_obj = Book(title, author, count)
-                        self.storage.update({title: book_obj})
-                        # self.storage.update({title: {"author": author,
-                        #                              "count": int(count)
-                        #                              }})
-                        print(title, book_obj)
-                print("------------------------------")
-        print(f"Loaded {len(self.storage)} unique titles.\n")
-
+    def __init__(self, storage_manager:StorageManager):
+        self.db = storage_manager.storage
 
     # Method that prints the book information, together with the number of stored books
     def show_books(self):
         print("\n--- CURRENT LIBRARY INVENTORY ---")
-        for book in self.storage:
-            print(self.storage[book])
-
-    # This method is used for the "employee" to use when new books are added to the library
-    def update_storage(self):
-        print("---ADDING BOOKS TO STORAGE---")
-        while True:
-            book_title = input("Book title: ").strip()
-            nb_books = int(input(f"Number of new '{book_title}' books you want to add: "))
-
-            if nb_books <= 0:
-                print("⚠️ Please enter a positive number.")
-                continue
-
-            if book_title in self.storage:
-                # book_obj = Book(book_title, self.storage[book_title]["author"])
-                self.storage[book_title].count += nb_books
-            else:
-                book_author = input("Book_author: ")
-                book_obj = Book(book_title, book_author, nb_books)
-                self.storage.update({book_title: book_obj})
-                # self.storage.update({book_obj.title: {"author": book_obj.author,
-                #                                       "count": nb_books}})
-                print("New book added to library!")
-
-            # Dynamic printing
-            word = "book" if nb_books == 1 else "books"
-            print(f"{nb_books} '{book_title}' {word} added to library.\n"
-                  f"Number of books: {self.storage[book_title].count}")
-            print("------------------------------")
-
-            if input("Do you want to add more books? (y/n) ") != "y":
-                break
+        for book in self.db:
+            print(self.db[book])
 
 
     # Used when a customer wants to return the book
@@ -84,7 +25,7 @@ class Library:
                 print("Exiting form.")
                 return
 
-            elif book_name_input not in self.storage:
+            elif book_name_input not in self.db:
                 print(f"❌ '{book_name_input}' was not found in library. Check spelling.")
                 continue
 
@@ -97,7 +38,7 @@ class Library:
                 print(f"Returning {book_amount_input} {book_name_input} books?")
                 confirmation = input("Please confirm (y/n): ").lower()
                 if confirmation == "y":
-                    self.storage[book_name_input].count += book_amount_input
+                    self.db[book_name_input].count += book_amount_input
                     print(f"✅ {book_amount_input} {book_name_input} books were successfully returned. ")
                     break
                 elif confirmation == "n":
@@ -106,7 +47,6 @@ class Library:
 
             if input("Do you want to return more books? (y/n): ").strip() != "y":
                 break
-
 
 
     # Used when the customer is borrowing a book
@@ -119,11 +59,11 @@ class Library:
                 print("Exiting form")
                 return
 
-            elif book_name_input not in self.storage:
+            elif book_name_input not in self.db:
                 print(f"❌ '{book_name_input}' was not found in library. Check spelling.")
                 continue
 
-            book_data = self.storage[book_name_input]
+            book_data = self.db[book_name_input]
             print(f"Available books: {book_data.count}.")
 
             while True:
@@ -138,7 +78,6 @@ class Library:
                     if amount > book_data.count:
                         print(f"⚠️ Please enter a lower number. {book_data.count} books available.")
                         continue
-
 
                     print(f"Borrowing {amount} {book_name_input} books?")
                     confirmation = input("Please confirm (y/n): ").lower()
@@ -157,29 +96,40 @@ class Library:
                 return
 
 
+    # This method is used for the "employee" to use when new books are added to the library
+    def add_new_books(self):
+        print("---ADDING BOOKS TO STORAGE---")
+        while True:
+            while True:
+                book_title = input("Book title: ").strip()
+                if book_title in self.db:
+                    print(self.db[book_title])
+                try:
+                    nb_books = int(input(f"Number of new '{book_title}' books you want to add: "))
+                    if nb_books <= 0:
+                        print("⚠️ Please enter a positive number.")
+                        continue
+                    else:
+                        break
+                except ValueError:
+                    print("Please enter a whole number (1, 3, 4...)!")
 
-    # Saving book Name, Author and number of books to file
-    def save_storage(self):
-        temp_file = self.file_name + ".tmp"
-        backup_file = self.file_name + ".bak"
 
-        try:
-            # 1. Write to a TEMPORARY file first
-            with open(temp_file, "w") as f:
-                for book_name, book_info in self.storage.items():
-                    f.write(f"{book_info.title};{book_info.author};{book_info.count}\n")
 
-            # 2. If writing succeeded, create a backup of the old file
-            if os.path.exists(self.file_name):
-                if os.path.exists(backup_file):
-                    os.remove(backup_file)
-                os.rename(self.file_name, backup_file)
+            if book_title in self.db:
+                self.db[book_title].count += nb_books
+            else:
+                book_author = input("Book_author: ")
+                book_obj = Book(book_title, book_author, nb_books)
+                self.db.update({book_title: book_obj})
+                print("New book added to library!")
 
-            # 3. Rename the temp file to the real filename
-            os.rename(temp_file, self.file_name)
-            print("✅ Data saved securely.")
+            # Dynamic printing
+            word = "book" if nb_books == 1 else "books"
+            print(f"{nb_books} '{book_title}' {word} added to library.\n"
+                  f"Number of books: {self.db[book_title].count}")
+            print("------------------------------")
 
-        except Exception as e:
-            print(f"❌ Critical Save Error: {e}")
-
+            if input("Do you want to add more books? (y/n) ") != "y":
+                break
 

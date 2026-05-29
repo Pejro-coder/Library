@@ -1,5 +1,5 @@
-Misek Mali;Peter;87
-Trava raste;Tomaz;21
+Misek Mali;Peter;95
+Trava raste;Tomaz;20
 Misekovec;JOJO;4
 Jiji;Jojo;69
 Hisa Bela;Tomaz;44
@@ -10,3 +10,10 @@ JAKAKKA;Jo e;432
 Drek JO;Joko;78
 TEST;TEST;44
 KRNEKEKEI;KRKRKRKRRK;414114221
+Luka se jezi;Luka;1
+Jezni Luka;Luka;69
+Jure Luka;Peter;11
+knjigica444;Peeet;444
+asasa;pepe;4141
+asa;Peter;8
+klobasa;Peter;4
