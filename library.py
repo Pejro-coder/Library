@@ -1,4 +1,4 @@
-### Library
+# Library
 import os
 from storage_manager import StorageManager
 from book import Book
@@ -6,7 +6,7 @@ from book import Book
 
 class Library:
     def __init__(self, storage_manager:StorageManager):
-        self.db = storage_manager.storage
+        self.db = storage_manager.book_storage
 
     # Method that prints the book information, together with the number of stored books
     def show_books(self):
@@ -19,7 +19,7 @@ class Library:
     def return_book(self):
         print("---RETURNING BOOKS---")
         while True:
-            book_name_input = input("Book you want to return: ").strip()
+            book_name_input = input("Book you want to return (press 'x' to exit): ").strip()
 
             if book_name_input == "x":
                 print("Exiting form.")
@@ -53,7 +53,7 @@ class Library:
     def borrow_book(self):
         print("---BORROWING BOOKS---")
         while True:
-            book_name_input = input("Book you want to borrow: ").strip()
+            book_name_input = input("Book you want to borrow: (press 'x' to exit)").strip()
 
             if book_name_input == "x":
                 print("Exiting form")
