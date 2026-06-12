@@ -3,6 +3,7 @@ import os
 from book import Book
 from pathlib import Path
 from user import User
+import random
 
 
 class StorageManager:
@@ -16,9 +17,9 @@ class StorageManager:
     # def testing_something():
     #     print("---")
 
-# ----------------------- Methods that handle books ------------------------------------------
+    # ----------------------- Methods that handle books ------------------------------------------
 
-    def load_bfile_and_save_to_storage(self):
+    def load_books_to_storage(self):
         # Check if file exists so we don't crash
         if not os.path.exists(self.book_storage_file):
             print("No BOOK saved data found. Starting fresh.")
@@ -26,7 +27,7 @@ class StorageManager:
             #     f.write("")
             return
         with open(self.book_storage_file, "r") as f:
-            print("\n       ------LOADING FROM FILE------\n")
+            print("\n       ------LOADING BOOKS FROM FILE------\n")
             for line in f:
                 line = line.strip()
                 if line:
@@ -38,9 +39,8 @@ class StorageManager:
                 # print("------------------------------")
         print(f"Loaded {len(self.book_storage)} unique titles.\n")
 
-
     # Saving book Name, Author and number of books to file
-    def save_storage_to_file(self):
+    def save_books(self):
         temp_file = self.book_storage_file.with_suffix(".txt.tmp")
         backup_file = self.book_storage_file.with_suffix(".txt.bak")
 
@@ -64,9 +64,7 @@ class StorageManager:
         except Exception as e:
             print(f"❌ Critical Save Error: {e}")
 
-
-# ----------------------- Methods that handle users ------------------------------------------
-
+    # ----------------------- Methods that handle users ------------------------------------------
 
     # # Show created users, that are saved inside the user_storage_file
     # def load_users(self):
@@ -75,33 +73,51 @@ class StorageManager:
     #             print(f"{line=}")
 
     # Show created users, that are saved inside the user_storage_file
-    def load_users(self):
+    def load_users_to_storage(self):
         # Check if file exists so we don't crash
         if not os.path.exists(self.user_storage_file):
             print("No USER saved data found. Starting fresh.")
             return
         with open(self.user_storage_file, "r") as f:
             for line in f:
-                print(line.strip())
                 split_line = line.strip().split(",")
-                print(split_line)
-                self.user_storage.update()
-                print()
-                # print(f"{line=}")
+                user = User(name=split_line[0], surname=split_line[1], username=split_line[2], password=split_line[3])
+                self.user_storage.update({split_line[2]: user})
+        print("\n       ------LOADING USERS FROM FILE------\n")
+        for user in self.user_storage:
+            print(user, self.user_storage[user])
+        print(f"Loaded {len(self.user_storage)} users.\n")
 
-
-    # Save created use to the user_storage_file.......Check Book Class
+    # Save created use to the user_storage_file
     def save_user(self, user: User):
-        to_save = f"{user.name}, {user.surname}, {user.username}, {user.password}\n"
+        # Check for user duplicate
+        if user.username in self.user_storage:
+            print("This username is already taken!")
+            go_on = input("Adding the user with a new username (y to continue): ").lower()
+            if go_on == "y":
+                while user.username in self.user_storage:
+                    user.username = user.username + str(random.randint(0, 1))
+            else:
+                print("Canceling...")
+                return
+        self.user_storage.update({user.username: user})
+        to_save = f"{user.name},{user.surname},{user.username},{user.password}\n"
         print(f"{to_save=}")
         with open(self.user_storage_file, "a") as f:
             f.write(to_save)
 
 
+if __name__ == "__main__":
+    shramba = StorageManager()
+    # shramba.load_books_to_storage()
 
-shramba = StorageManager()
-shramba.load_bfile_and_save_to_storage()
-print(shramba.book_storage)
+    peter = User("Komad", "Drugi")
+    luka = User("Luka", "Drugi")
+    # print(peter.surname, peter.username)
+    shramba.load_users_to_storage()
+    peterstepanic = shramba.user_storage["peterstepanic"]
+    print(shramba.user_storage["peterstepanic"].password)
+    print(shramba.user_storage["lukadrugi"].password)
 
-shramba.load_users()
-
+    shramba.save_user(peter)
+    shramba.save_user(luka)

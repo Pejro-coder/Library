@@ -1,4 +1,13 @@
-Peter, Stepanic, PeterStepanic, kCUzj1nw
-Tomaz, Stepanic, TomazStepanic, cr6HzPO2
-Tom, Stepanic, TomStepanic, wCrAQVd9
-Julija, Stepanic, JulijaStepanic, hDluyrey
+Peter,Stepanic,peterstepanic,I4s9Hv3e
+Tomaz,Stepanic,tomazstepanic,kkzxEWvd
+Komad,Drugi,komaddrugi,9CN2af42
+Komad,Drugi,komaddrugi0,oFKD6HyF
+Komad,Drugi,komaddrugi1,68F19FUr
+Komad,Drugi,komaddrugi00,nJNuF4Wy
+Komad,Drugi,komaddrugi11,YnRD6gBD
+Komad,Drugi,komaddrugi111,T1at92iM
+Komad,Drugi,komaddrugi110,fFoCqO5D
+Komad,Drugi,komaddrugi000,1qz9YaMg
+Komad,Drugi,komaddrugi1110,AJOyQL1O
+Komad,Drugi,komaddrugi0001,fPsyjV5u
+Luka,Drugi,lukadrugi,Wf2OaajD

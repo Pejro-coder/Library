@@ -4,8 +4,9 @@ from storage_manager import StorageManager
 from user import User
 
 
+
 storage_manager = StorageManager()
-storage_manager.load_bfile_and_save_to_storage()
+storage_manager.load_books_to_storage()
 
 # storage_manager.load_users()
 
@@ -29,5 +30,5 @@ library_celje.add_new_books()
 library_celje.return_book()
 library_celje.borrow_book()
 
-storage_manager.save_storage_to_file()
+storage_manager.save_books()
 
