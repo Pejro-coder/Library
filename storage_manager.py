@@ -1,4 +1,4 @@
-# Library
+# Storage_manager
 import os
 from book import Book
 from pathlib import Path
@@ -23,7 +23,7 @@ class StorageManager:
         # Check if file exists so we don't crash
         if not os.path.exists(self.book_storage_file):
             print("No BOOK saved data found. Starting fresh.")
-            # with open(self.book_storage_file, "w") as f:  # Creating new file is handled at at save_storage_to_file
+            # with open(self.book_storage_file, "w") as f:  # Creating new file is handled at save_storage_to_file
             #     f.write("")
             return
         with open(self.book_storage_file, "r") as f:

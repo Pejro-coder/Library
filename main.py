@@ -3,8 +3,6 @@ from library import Library
 from storage_manager import StorageManager
 from user import User
 
-
-
 storage_manager = StorageManager()
 storage_manager.load_books_to_storage()
 
@@ -32,3 +30,5 @@ library_celje.borrow_book()
 
 storage_manager.save_books()
 
+
+# Test comment,
