@@ -15,8 +15,8 @@ class Library:
             print(self.db[book])
 
 
-    # Used when a customer wants to return the book
-    def return_book(self):
+    # Used when a customer wants to return the book. Currently being refactored
+    def return_book_old(self):
         print("---RETURNING BOOKS---")
         while True:
             book_name_input = input("Book you want to return (press 'x' to exit): ").strip()
@@ -42,12 +42,19 @@ class Library:
                     print(f"✅ {book_amount_input} {book_name_input} books were successfully returned. ")
                     break
                 elif confirmation == "n":
-                    print("0 book borrowed. Exiting.")
+                    print("0 book returned. Exiting.")
                     break
 
             if input("Do you want to return more books? (y/n): ").strip() != "y":
                 break
 
+    # Used when a customer wants to return the book
+    def return_book(self, book_name: str, amount: int):
+        if book_name not in self.db:
+            return False, f"❌ {book_name} was not found in database!"
+        else:
+            self.db[book_name].count += amount
+            return True, f"✅ {book_name} was successfully returned."
 
     # Used when the customer is borrowing a book
     def borrow_book(self):
@@ -113,8 +120,6 @@ class Library:
                         break
                 except ValueError:
                     print("Please enter a whole number (1, 3, 4...)!")
-
-
 
             if book_title in self.db:
                 self.db[book_title].count += nb_books
