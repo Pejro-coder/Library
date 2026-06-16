@@ -12,14 +12,12 @@ library_celje = Library(storage_manager)
 # library_celje.add_new_books()
 # library_celje.borrow_book()
 
-storage_manager.save_books()
 
 
-# Test comment,
-# Test comment two
 
-
+# function that calls the 'library_celje.return_book' method if the criteria is meet
 def return_books():
+    print("          ------RETURNING BOOKS------       ")
     while True:
         book_name_input = input("Book you want to return (press 'x' to exit): ").strip()
         if book_name_input == "x":
@@ -48,3 +46,6 @@ def return_books():
 
 
 return_books()
+
+
+storage_manager.save_books()
