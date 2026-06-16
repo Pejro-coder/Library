@@ -8,70 +8,49 @@ class Library:
     def __init__(self, storage_manager:StorageManager):
         self.db = storage_manager.book_storage
 
-    # Method that prints the book information, together with the number of stored books
+
+    # Method that prints the book information, together with the number of stored books for each book in storage
     def show_books(self):
         print("\n--- CURRENT LIBRARY INVENTORY ---")
         for book in self.db:
             print(self.db[book])
 
 
-    # Used when a customer wants to return the book
-    def return_book(self, book_name: str, amount: int):
+    # Returns the number of a specific book in library
+    def book_count(self, book_name):
         if book_name not in self.db:
-            return False, f"❌ {book_name} was not found in database!"
+            return False, f"❌ {book_name} was not found in library. Check spelling."
+        book_count = self.db[book_name].count
+        return True, book_count
+
+
+    # Used when a customer wants to return the book
+    def return_book(self, book_name: str, book_amount: int):
+        if book_name not in self.db:
+            return False, f"❌ {book_name} was not found in library. Check spelling."
         else:
-            self.db[book_name].count += amount
+            self.db[book_name].count += book_amount
             return True, f"✅ {book_name} was successfully returned."
 
 
     # Used when the customer is borrowing a book
-    def borrow_book(self):
-        print("---BORROWING BOOKS---")
-        while True:
-            book_name_input = input("Book you want to borrow: (press 'x' to exit)").strip()
+    def borrow_book(self, book_name: str, book_amount: int):
+        if book_name not in self.db:
+            return False, f"❌ '{book_name}' was not found in library. Check spelling."
+        book_data = self.db[book_name]
 
-            if book_name_input == "x":
-                print("Exiting form")
-                return
+        if book_amount > book_data.count:
+            return False, f"❌ only {book_data.count} are available in storage."
 
-            elif book_name_input not in self.db:
-                print(f"❌ '{book_name_input}' was not found in library. Check spelling.")
-                continue
+        book_data.count -= book_amount
 
-            book_data = self.db[book_name_input]
-            print(f"Available books: {book_data.count}.")
-
-            while True:
-                try:
-                    book_amount_input = input(f"Number of books to borrow: ").strip()
-                    amount = int(book_amount_input) if book_amount_input else 1
-
-                    if amount <= 0:
-                        print("⚠️ Please enter a positive number.")
-                        continue
-
-                    if amount > book_data.count:
-                        print(f"⚠️ Please enter a lower number. {book_data.count} books available.")
-                        continue
-
-                    print(f"Borrowing {amount} {book_name_input} books?")
-                    confirmation = input("Please confirm (y/n): ").lower()
-                    if confirmation == "y":
-                        book_data.count -= amount
-                        print(f"✅ {amount} {book_name_input} books were successfully borrowed. ")
-                        break
-                    elif confirmation == "n":
-                        print("0 book borrowed. Exiting.")
-                        break
-
-                except ValueError:
-                    print("❌ Please type a whole number.")
-
-            if input("Borrow more books? y/n: ").lower() != "y":
-                return
+        book_s = "book"
+        if book_amount > 1:
+            book_s = "books"
+        return True, f"✅ successfully borrowed {book_amount} '{book_name}' {book_s}."
 
 
-    # This method is used for the "employee" to use when new books are added to the library
+        # This method is used for the "employee" to use when new books are added to the library
     def add_new_books(self):
         print("---ADDING BOOKS TO STORAGE---")
         while True:
