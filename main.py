@@ -6,15 +6,44 @@ from user import User
 
 storage_manager = StorageManager()
 storage_manager.load_books_to_storage()
-print(storage_manager.book_storage["Misek Mali"])
 library_celje = Library(storage_manager)
-# library_celje.show_books()
-# library_celje.add_new_books()
 
 
+def add_new_books():
+    print("---ADDING BOOKS TO STORAGE---")
+    while True:
+        while True:
+            book_title = input("Book title: ").strip()
+            if library_celje.get_available_copies(book_title):
+                library_celje.book_info(book_title)
+            try:
+                nb_books = int(input(f"Number of new '{book_title}' books you want to add: "))
+                if nb_books <= 0:
+                    print("⚠️ Please enter a positive number.")
+                    continue
+                else:
+                    break
+            except ValueError:
+                print("Please enter a whole number (1, 3, 4...)!")
 
-# print(library_celje.book_count("Misek Mali"))
+        if library_celje.get_available_copies(book_title):
+            library_celje.add_new_book(book_title, nb_books) #Try moving this up above
+        else:
+            book_author = input("Book_author: ")
+            library_celje.add_new_book(book_title, nb_books, book_author=book_author)
+            print("New book added to library!")
 
+        # Dynamic printing
+        word = "book" if nb_books == 1 else "books"
+        print(f"{nb_books} '{book_title}' {word} added to library.\n"
+              f"Number of books: {library_celje.get_available_copies(book_title)[1]}")
+        print("------------------------------")
+
+        if input("Do you want to add more books? (y/n) ") != "y":
+            break
+
+
+# function that calls the 'library_celje.borrow_book' method if the criteria is meet
 def borrow_books():
     print("          ------BORROWING BOOKS------       ")
     while True:
@@ -23,14 +52,14 @@ def borrow_books():
             print("Exiting form")
             return
 
-        book_status = library_celje.book_count(book_name_input)
+        book_status = library_celje.get_available_copies(book_name_input)
         # Book was not found
         if book_status[0] == False:
             print(book_status[1])
             continue
         available_books = book_status[1]
         if available_books < 1:
-            print(f"There are {book_status[1]} of {book_name_input} books available.")
+            print(f"There are {available_books} of {book_name_input} books available.")
             break
         else:
             print(f"Available books: {book_status[1]}.")
@@ -64,7 +93,6 @@ def borrow_books():
             return
 
 
-
 # function that calls the 'library_celje.return_book' method if the criteria is meet
 def return_books():
     print("          ------RETURNING BOOKS------       ")
@@ -95,8 +123,7 @@ def return_books():
                 break
 
 
-borrow_books()
-return_books()
-
-
+add_new_books()
+# borrow_books()
+# return_books()
 storage_manager.save_books()
