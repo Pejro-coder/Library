@@ -45,9 +45,8 @@ class Library:
     # Returns the number of a specific book in library
     def get_available_copies(self, book_name: str):
         if book_name not in self.db:
-            return f"❌ {book_name} was not found in library. Check spelling."
-        book_count = self.db[book_name].count
-        return book_count
+            return 0
+        return self.db[book_name].count
 
 
     # Used when the customer is borrowing a book
