@@ -15,11 +15,13 @@ class Library:
         return None
 
 
+    # Used when adding a totally new book
     def add_new_book(self, book_title: str, book_amount:int , book_author: str = None):
             book_obj = Book(book_title, book_author, book_amount)
             self.db.update({book_title: book_obj})
 
 
+    # Used when updating a book amount in storage
     def update_book_amount(self, book_title: str, book_amount:int):
         if book_title in self.db:
             self.db[book_title].count += book_amount
@@ -39,13 +41,6 @@ class Library:
         else:
             return False
 
-
-    # Returns the number of a specific book in library
-    def get_available_copies_old(self, book_name: str):
-        if book_name not in self.db:
-            return False, f"❌ {book_name} was not found in library. Check spelling."
-        book_count = self.db[book_name].count
-        return True, book_count
 
     # Returns the number of a specific book in library
     def get_available_copies(self, book_name: str):
