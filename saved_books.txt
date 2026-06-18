@@ -1,4 +1,4 @@
-Misek Mali;Peter;80
+Misek Mali;Peter;123
 Trava raste;Tomaz;19
 Misekovec;JOJO;4
 Jiji;Jojo;69
@@ -7,3 +7,8 @@ Huda Muha;Luka;20
 Kmet na Vrhu;Kmetac;112
 Nov Njiga Superca;Mudel En;4
 Test Pet;Petro;2
+Asko;Pero;6
+Jokco;Perc;2
+Jaka Skace;Joze;14
+Miha Piha;Mojca;2
+Jokcaaca;1;1

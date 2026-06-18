@@ -9,6 +9,22 @@ class Library:
         self.db = storage_manager.book_storage
 
 
+    def book_info(self, book_name):
+        if book_name in self.db:
+            return self.db[book_name]
+        return None
+
+
+    def add_new_book(self, book_title: str, book_amount:int , book_author: str = None):
+            book_obj = Book(book_title, book_author, book_amount)
+            self.db.update({book_title: book_obj})
+
+
+    def update_book_amount(self, book_title: str, book_amount:int):
+        if book_title in self.db:
+            self.db[book_title].count += book_amount
+
+
     # Method that prints the book information, together with the number of stored books for each book in storage
     def show_books(self):
         print("\n--- CURRENT LIBRARY INVENTORY ---")
@@ -16,21 +32,27 @@ class Library:
             print(self.db[book])
 
 
+    # Check if the book already exists in storage
+    def book_in_storage(self, book_name: str):
+        if book_name in self.db:
+            return True
+        else:
+            return False
+
+
     # Returns the number of a specific book in library
-    def book_count(self, book_name):
+    def get_available_copies_old(self, book_name: str):
         if book_name not in self.db:
             return False, f"❌ {book_name} was not found in library. Check spelling."
         book_count = self.db[book_name].count
         return True, book_count
 
-
-    # Used when a customer wants to return the book
-    def return_book(self, book_name: str, book_amount: int):
+    # Returns the number of a specific book in library
+    def get_available_copies(self, book_name: str):
         if book_name not in self.db:
-            return False, f"❌ {book_name} was not found in library. Check spelling."
-        else:
-            self.db[book_name].count += book_amount
-            return True, f"✅ {book_name} was successfully returned."
+            return f"❌ {book_name} was not found in library. Check spelling."
+        book_count = self.db[book_name].count
+        return book_count
 
 
     # Used when the customer is borrowing a book
@@ -44,14 +66,21 @@ class Library:
 
         book_data.count -= book_amount
 
-        book_s = "book"
-        if book_amount > 1:
-            book_s = "books"
+        book_s = "books" if book_amount > 1 else "book"
         return True, f"✅ successfully borrowed {book_amount} '{book_name}' {book_s}."
 
 
-        # This method is used for the "employee" to use when new books are added to the library
-    def add_new_books(self):
+    # Used when a customer wants to return the book
+    def return_book(self, book_name: str, book_amount: int):
+        if book_name not in self.db:
+            return False, f"❌ {book_name} was not found in library. Check spelling."
+        else:
+            self.db[book_name].count += book_amount
+            return True, f"✅ {book_name} was successfully returned."
+
+
+    # This method is used for the "employee" to use when new books are added to the library
+    def add_new_books_old(self):
         print("---ADDING BOOKS TO STORAGE---")
         while True:
             while True:

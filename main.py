@@ -14,8 +14,10 @@ def add_new_books():
     while True:
         while True:
             book_title = input("Book title: ").strip()
-            if library_celje.get_available_copies(book_title):
-                library_celje.book_info(book_title)
+            if library_celje.book_in_storage(book_title):
+                print(library_celje.book_info(book_title))
+            else:
+                print("Book was not found, adding as a new book!")
             try:
                 nb_books = int(input(f"Number of new '{book_title}' books you want to add: "))
                 if nb_books <= 0:
@@ -26,17 +28,16 @@ def add_new_books():
             except ValueError:
                 print("Please enter a whole number (1, 3, 4...)!")
 
-        if library_celje.get_available_copies(book_title):
-            library_celje.add_new_book(book_title, nb_books) #Try moving this up above
-        else:
+        if library_celje.book_in_storage(book_title): # Updating existing book
+            library_celje.update_book_amount(book_title, nb_books)
+        else: # Adding new book
             book_author = input("Book_author: ")
-            library_celje.add_new_book(book_title, nb_books, book_author=book_author)
-            print("New book added to library!")
+            library_celje.add_new_book(book_title, nb_books, book_author)
 
         # Dynamic printing
         word = "book" if nb_books == 1 else "books"
         print(f"{nb_books} '{book_title}' {word} added to library.\n"
-              f"Number of books: {library_celje.get_available_copies(book_title)[1]}")
+              f"Number of books: {library_celje.get_available_copies(book_title)}")
         print("------------------------------")
 
         if input("Do you want to add more books? (y/n) ") != "y":
@@ -52,17 +53,17 @@ def borrow_books():
             print("Exiting form")
             return
 
-        book_status = library_celje.get_available_copies(book_name_input)
         # Book was not found
-        if book_status[0] == False:
-            print(book_status[1])
+        if not library_celje.book_in_storage(book_name_input):
+            print(f"❌ {book_name_input} was not found in library. Check spelling.")
             continue
-        available_books = book_status[1]
+
+        available_books = library_celje.get_available_copies(book_name_input)
         if available_books < 1:
             print(f"There are {available_books} of {book_name_input} books available.")
             break
         else:
-            print(f"Available books: {book_status[1]}.")
+            print(f"Available books: {available_books}.")
 
         while True:
             try:
@@ -80,6 +81,7 @@ def borrow_books():
                 print(f"Borrowing {amount} {book_name_input} books?")
                 confirmation = input("Please confirm (y/n): ").lower()
                 if confirmation == "y":
+                    # Borrowing the book from the actual storage
                     print(library_celje.borrow_book(book_name_input, book_amount_input))
                     break
                 elif confirmation == "n":
