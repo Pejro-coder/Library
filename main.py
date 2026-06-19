@@ -1,4 +1,5 @@
 # Main — CLI entry point for the Library app (add, borrow, return books).
+# Loads persisted books, runs add/borrow/return menus, then saves storage.
 from library import Library
 from storage_manager import StorageManager
 from user import User
