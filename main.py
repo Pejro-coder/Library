@@ -1,4 +1,4 @@
-# Main
+# Main — CLI entry point for the Library app (add, borrow, return books).
 from library import Library
 from storage_manager import StorageManager
 from user import User
@@ -130,4 +130,5 @@ borrow_books()
 return_books()
 storage_manager.save_books()
 
+# Moj test comment. Peter
 # hello cursor!
