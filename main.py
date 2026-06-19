@@ -126,6 +126,8 @@ def return_books():
 
 
 add_new_books()
-# borrow_books()
-# return_books()
+borrow_books()
+return_books()
 storage_manager.save_books()
+
+# hello cursor!
