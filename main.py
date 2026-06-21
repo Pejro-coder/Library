@@ -9,6 +9,11 @@ storage_manager.load_books_to_storage()
 storage_manager.load_users_to_storage()
 library_celje = Library(storage_manager)
 
+def commit_push_test():
+    print("---COMMITING AND PUSHING TEST---")
+    print("Commiting and pushing test...")
+    print("Test committed and pushed successfully!")
+    print("------------------------------")
 
 def add_new_books():
     print("---ADDING BOOKS TO STORAGE---")
