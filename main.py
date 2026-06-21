@@ -2,11 +2,11 @@
 # Loads persisted books, runs add/borrow/return menus, then saves storage.
 from library import Library
 from storage_manager import StorageManager
-from user import User
 
 
 storage_manager = StorageManager()
 storage_manager.load_books_to_storage()
+storage_manager.load_users_to_storage()
 library_celje = Library(storage_manager)
 
 
@@ -42,6 +42,26 @@ def add_new_books():
         print("------------------------------")
 
         if input("Do you want to add more books? (y/n) ") != "y":
+            break
+
+
+def create_users():
+    print("---CREATING USERS---")
+    while True:
+        first_name = input("First Name: ").strip()
+        last_name = input("Last Name: ").strip()
+        try:
+            user = library_celje.add_new_user(first_name, last_name)
+        except ValueError as e:
+            print(e)
+            continue
+
+        print(f"User created successfully!")
+        print(f"  Username: {user.username}")
+        print(f"  Password: {user.password}")
+        print("------------------------------")
+
+        if input("Do you want to create more users? (y/n) ") != "y":
             break
 
 
@@ -126,10 +146,9 @@ def return_books():
                 break
 
 
-add_new_books()
-borrow_books()
-return_books()
+create_users()
+# add_new_books()
+# borrow_books()
+# return_books()
+storage_manager.save_users()
 storage_manager.save_books()
-
-# Moj test comment. Peter
-# hello cursor!

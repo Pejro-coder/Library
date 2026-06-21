@@ -14,3 +14,4 @@ Miha Piha;Mojca;2
 Jokcaaca;1;1
 Peter na pohodu;Perko;13
 Micko123;Tomaz;44
+Test;Test12;12

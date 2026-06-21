@@ -3,7 +3,6 @@ import os
 from book import Book
 from pathlib import Path
 from user import User
-import random
 
 
 class StorageManager:
@@ -88,23 +87,25 @@ class StorageManager:
             print(user, self.user_storage[user])
         print(f"Loaded {len(self.user_storage)} users.\n")
 
-    # Save created use to the user_storage_file
-    def save_user(self, user: User):
-        # Check for user duplicate
-        if user.username in self.user_storage:
-            print("This username is already taken!")
-            go_on = input("Adding the user with a new username (y to continue): ").lower()
-            if go_on == "y":
-                while user.username in self.user_storage:
-                    user.username = user.username + str(random.randint(0, 1))
-            else:
-                print("Canceling...")
-                return
-        self.user_storage.update({user.username: user})
-        to_save = f"{user.name},{user.surname},{user.username},{user.password}\n"
-        print(f"{to_save=}")
-        with open(self.user_storage_file, "a") as f:
-            f.write(to_save)
+    def save_users(self):
+        temp_file = self.user_storage_file.with_suffix(".txt.tmp")
+        backup_file = self.user_storage_file.with_suffix(".txt.bak")
+
+        try:
+            with open(temp_file, "w") as f:
+                for user in self.user_storage.values():
+                    f.write(f"{user.name},{user.surname},{user.username},{user.password}\n")
+
+            if os.path.exists(self.user_storage_file):
+                if os.path.exists(backup_file):
+                    os.remove(backup_file)
+                os.rename(self.user_storage_file, backup_file)
+
+            os.rename(temp_file, self.user_storage_file)
+            print("✅ User data saved securely.")
+
+        except Exception as e:
+            print(f"❌ Critical Save Error: {e}")
 
 
 if __name__ == "__main__":
@@ -119,5 +120,5 @@ if __name__ == "__main__":
     print(shramba.user_storage["peterstepanic"].password)
     print(shramba.user_storage["lukadrugi"].password)
 
-    shramba.save_user(peter)
-    shramba.save_user(luka)
+    shramba.user_storage.update({peter.username: peter, luka.username: luka})
+    shramba.save_users()
