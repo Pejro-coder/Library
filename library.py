@@ -72,39 +72,3 @@ class Library:
             self.db[book_name].count += book_amount
             return True, f"✅ {book_name} was successfully returned."
 
-
-    # This method is used for the "employee" to use when new books are added to the library
-    def add_new_books_old(self):
-        print("---ADDING BOOKS TO STORAGE---")
-        while True:
-            while True:
-                book_title = input("Book title: ").strip()
-                if book_title in self.db:
-                    print(self.db[book_title])
-                try:
-                    nb_books = int(input(f"Number of new '{book_title}' books you want to add: "))
-                    if nb_books <= 0:
-                        print("⚠️ Please enter a positive number.")
-                        continue
-                    else:
-                        break
-                except ValueError:
-                    print("Please enter a whole number (1, 3, 4...)!")
-
-            if book_title in self.db:
-                self.db[book_title].count += nb_books
-            else:
-                book_author = input("Book_author: ")
-                book_obj = Book(book_title, book_author, nb_books)
-                self.db.update({book_title: book_obj})
-                print("New book added to library!")
-
-            # Dynamic printing
-            word = "book" if nb_books == 1 else "books"
-            print(f"{nb_books} '{book_title}' {word} added to library.\n"
-                  f"Number of books: {self.db[book_title].count}")
-            print("------------------------------")
-
-            if input("Do you want to add more books? (y/n) ") != "y":
-                break
-
