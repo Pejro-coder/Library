@@ -107,8 +107,8 @@ def borrow_books():
                 print(f"Borrowing {amount} {book_name_input} books?")
                 confirmation = input("Please confirm (y/n): ").lower()
                 if confirmation == "y":
-                    # Borrowing the book from the actual storage
-                    print(library_celje.borrow_book(book_name_input, book_amount_input))
+                    _, message = library_celje.borrow_book(book_name_input, amount)
+                    print(message)
                     break
                 elif confirmation == "n":
                     print("0 book borrowed. Exiting.")
@@ -144,16 +144,42 @@ def return_books():
             print(f"Returning {book_amount_input} '{book_name_input}' books?")
             confirmation = input("Please confirm (y/n): ").lower()
             if confirmation == "y":
-                print(library_celje.return_book(book_name_input, book_amount_input))
+                _, message = library_celje.return_book(book_name_input, book_amount_input)
+                print(message)
                 break
             elif confirmation == "n":
                 print("0 books returned. Exiting.")
                 break
 
 
-create_users()
-# add_new_books()
-# borrow_books()
-# return_books()
-storage_manager.save_users()
-storage_manager.save_books()
+def main_menu():
+    while True:
+        print("\n--- LIBRARY MENU ---")
+        print("1. Add books")
+        print("2. Create users")
+        print("3. Borrow books")
+        print("4. Return books")
+        print("5. Show inventory")
+        print("6. Exit")
+        choice = input("Choose an option (1-6): ").strip()
+
+        if choice == "1":
+            add_new_books()
+        elif choice == "2":
+            create_users()
+        elif choice == "3":
+            borrow_books()
+        elif choice == "4":
+            return_books()
+        elif choice == "5":
+            library_celje.show_books()
+        elif choice == "6":
+            break
+        else:
+            print("Invalid choice. Please enter 1-6.")
+
+
+if __name__ == "__main__":
+    main_menu()
+    storage_manager.save_users()
+    storage_manager.save_books()

@@ -1,4 +1,8 @@
 import random
 
-print(random.randint(10, 20))
+
+name = "Peter"
+enumerated = enumerate(name, start=1)
+
+print(list(enumerated))
 

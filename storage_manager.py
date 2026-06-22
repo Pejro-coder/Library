@@ -64,27 +64,25 @@ class StorageManager:
             print(f"❌ Critical Save Error: {e}")
 
     # ----------------------- Methods that handle users ------------------------------------------
-
-    # # Show created users, that are saved inside the user_storage_file
-    # def load_users(self):
-    #     with open(self.user_storage_file, "r") as f:
-    #         for line in f:
-    #             print(f"{line=}")
-
-    # Show created users, that are saved inside the user_storage_file
+    
     def load_users_to_storage(self):
         # Check if file exists so we don't crash
         if not os.path.exists(self.user_storage_file):
             print("No USER saved data found. Starting fresh.")
             return
-        with open(self.user_storage_file, "r") as f:
-            for line in f:
-                split_line = line.strip().split(",")
-                user = User(name=split_line[0], surname=split_line[1], username=split_line[2], password=split_line[3])
-                self.user_storage.update({split_line[2]: user})
         print("\n       ------LOADING USERS FROM FILE------\n")
-        for user in self.user_storage:
-            print(user, self.user_storage[user])
+        with open(self.user_storage_file, "r") as f:
+            for line_no, line in enumerate[str](f, start=1):
+                line = line.strip()
+                if not line:
+                    continue
+                split_line = line.split(",")
+                if len(split_line) != 4:
+                    print(f"⚠️ Skipping malformed user line {line_no}: {line!r}")
+                    continue
+                name, surname, username, password = split_line
+                user = User(name=name, surname=surname, username=username, password=password)
+                self.user_storage[username] = user
         print(f"Loaded {len(self.user_storage)} users.\n")
 
     def save_users(self):
