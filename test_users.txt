@@ -1,0 +1,17 @@
+Peter,Stepanic,peterstepanic,I4s9Hv3e,False,{}
+Tomaz,Stepanic,tomazstepanic,kkzxEWvd,False,{}
+Komad,Drugi,komaddrugi,9CN2af42,False,{}
+Komad,Drugi,komaddrugi0,oFKD6HyF,False,{}
+Komad,Drugi,komaddrugi1,68F19FUr,False,{}
+Komad,Drugi,komaddrugi00,nJNuF4Wy,False,{}
+Komad,Drugi,komaddrugi11,YnRD6gBD,False,{}
+Komad,Drugi,komaddrugi111,T1at92iM,False,{}
+Komad,Drugi,komaddrugi110,fFoCqO5D,False,{}
+Komad,Drugi,komaddrugi000,1qz9YaMg,False,{}
+Komad,Drugi,komaddrugi1110,AJOyQL1O,False,{}
+Komad,Drugi,komaddrugi0001,fPsyjV5u,False,{}
+Luka,Drugi,lukadrugi,Wf2OaajD,False,{}
+Harry,Potter,harrypotter,t2OcVwmd,False,{}
+Miha,Deželak,mihadeželak,iJc3bG28,False,{}
+Peter,Stepanic,peterstepanic8349,OwQKNI7U,False,{}
+A,B,testuser,x,True,{"Book": 2}

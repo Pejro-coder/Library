@@ -1,4 +1,5 @@
 # Storage_manager
+import json
 import os
 from book import Book
 from pathlib import Path
@@ -72,16 +73,42 @@ class StorageManager:
             return
         print("\n       ------LOADING USERS FROM FILE------\n")
         with open(self.user_storage_file, "r") as f:
-            for line_no, line in enumerate[str](f, start=1):
+            for line_no, line in enumerate(f, start=1):
                 line = line.strip()
                 if not line:
                     continue
-                split_line = line.split(",")
-                if len(split_line) != 4:
+
+                parts = line.split(",", 5)
+                if len(parts) == 4:
+                    name, surname, username, password = parts
+                    is_admin = False
+                    borrowed_books = {}
+                elif len(parts) == 5:
+                    name, surname, username, password, is_admin_str = parts
+                    is_admin = is_admin_str.strip().lower() in ("true", "1", "yes")
+                    borrowed_books = {}
+                elif len(parts) == 6:
+                    name, surname, username, password, is_admin_str, borrowed_json = parts
+                    is_admin = is_admin_str.strip().lower() in ("true", "1", "yes")
+                    try:
+                        borrowed_books = json.loads(borrowed_json) if borrowed_json else {}
+                        if not isinstance(borrowed_books, dict):
+                            borrowed_books = {}
+                    except json.JSONDecodeError:
+                        print(f"⚠️ Invalid borrowed_books JSON on line {line_no}; using empty dict.")
+                        borrowed_books = {}
+                else:
                     print(f"⚠️ Skipping malformed user line {line_no}: {line!r}")
                     continue
-                name, surname, username, password = split_line
-                user = User(name=name, surname=surname, username=username, password=password)
+
+                user = User(
+                    name=name,
+                    surname=surname,
+                    username=username,
+                    password=password,
+                    is_admin=is_admin,
+                    borrowed_books=borrowed_books,
+                )
                 self.user_storage[username] = user
         print(f"Loaded {len(self.user_storage)} users.\n")
 
@@ -92,7 +119,11 @@ class StorageManager:
         try:
             with open(temp_file, "w") as f:
                 for user in self.user_storage.values():
-                    f.write(f"{user.name},{user.surname},{user.username},{user.password}\n")
+                    borrowed_json = json.dumps(user.borrowed_books)
+                    f.write(
+                        f"{user.name},{user.surname},{user.username},{user.password},"
+                        f"{user.is_admin},{borrowed_json}\n"
+                    )
 
             if os.path.exists(self.user_storage_file):
                 if os.path.exists(backup_file):

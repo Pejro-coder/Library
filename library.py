@@ -53,7 +53,7 @@ class Library:
         return self.db[book_name].count
 
     # Used when the customer is borrowing a book
-    def borrow_book(self, book_name: str, book_amount: int):
+    def borrow_book(self, user: User, book_name: str, book_amount: int):
         if book_name not in self.db:
             return False, f"❌ '{book_name}' was not found in library. Check spelling."
         book_data = self.db[book_name]
@@ -62,14 +62,27 @@ class Library:
             return False, f"❌ only {book_data.count} are available in storage."
 
         book_data.count -= book_amount
+        user.borrowed_books[book_name] = user.borrowed_books.get(book_name, 0) + book_amount
 
         book_s = "books" if book_amount > 1 else "book"
         return True, f"✅ successfully borrowed {book_amount} '{book_name}' {book_s}."
 
     # Used when a customer wants to return the book
-    def return_book(self, book_name: str, book_amount: int):
+    def return_book(self, user: User, book_name: str, book_amount: int):
         if book_name not in self.db:
             return False, f"❌ {book_name} was not found in library. Check spelling."
+
+        borrowed_count = user.borrowed_books.get(book_name, 0)
+        if borrowed_count < book_amount:
+            return False, (
+                f"❌ you only have {borrowed_count} copy/copies of '{book_name}' to return."
+            )
+
+        remaining = borrowed_count - book_amount
+        if remaining == 0:
+            del user.borrowed_books[book_name]
         else:
-            self.db[book_name].count += book_amount
-            return True, f"✅ {book_name} was successfully returned."
+            user.borrowed_books[book_name] = remaining
+
+        self.db[book_name].count += book_amount
+        return True, f"✅ {book_name} was successfully returned."

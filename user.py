@@ -13,7 +13,15 @@ def generate_password(length=8):
 
 
 class User:
-    def __init__(self, name: str, surname: str, username: str = None, password: str = None):
+    def __init__(
+        self,
+        name: str,
+        surname: str,
+        username: str = None,
+        password: str = None,
+        is_admin: bool = False,
+        borrowed_books: dict = None,
+    ):
         if not name.isalpha():
             raise ValueError("❌ Use only letters for name!")
         if not surname.isalpha():
@@ -23,4 +31,6 @@ class User:
         self.surname = surname
         self.username = username if username else (name + surname).lower()
         self.password = password if password else generate_password()
+        self.is_admin = is_admin
+        self.borrowed_books = borrowed_books if borrowed_books is not None else {}
 
