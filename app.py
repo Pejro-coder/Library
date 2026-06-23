@@ -296,12 +296,4 @@ def main():
 
 
 if __name__ == "__main__":
-    from streamlit.runtime.scriptrunner import get_script_run_ctx
-
-    if get_script_run_ctx() is None:
-        import subprocess
-        import sys
-
-        subprocess.run([sys.executable, "-m", "streamlit", "run", __file__], check=True)
-    else:
-        main()
+    main()
