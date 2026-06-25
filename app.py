@@ -3,6 +3,7 @@ import streamlit as st
 from library import Library
 from storage_manager import StorageManager
 from user import User, generate_password
+# Version 1.0.0
 
 
 def init_session():
