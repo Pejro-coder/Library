@@ -4,3 +4,6 @@ Peter,Stepanic,peterstepanic,CHr3xVcx,False,{}
 Pero,En,peroen,12345,False,{}
 Pero,En,peroen2763,1234,False,{}
 Miha,Dezelak,mihadezelak,oQZMRh1W,False,{}
+Miha,Veliki,mihaveliki,5VVMFCBB,False,{}
+Miha,En,mihaen,123,False,{}
+Miha,Enaaa,mihaenaaa,94KgUUqr,False,{}

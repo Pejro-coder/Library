@@ -276,6 +276,9 @@ def show_admin_dashboard():
     with tab_users:
         show_tab_success_message("users")
 
+        if st.session_state.pop("clear_create_user_password", False):
+            st.session_state.create_user_password = ""
+
         if "create_user_password" not in st.session_state:
             st.session_state.create_user_password = ""
 
@@ -292,29 +295,29 @@ def show_admin_dashboard():
                 help="Type a password or use Auto-generate above.",
             )
             grant_admin = st.checkbox("Grant Administrator Permissions")
-            create_submitted = st.form_submit_button(
-                "Create Account",
-                disabled=not password.strip(),
-            )
+            create_submitted = st.form_submit_button("Create Account")
 
         if create_submitted:
             clear_tab_success_message("users")
-            try:
-                new_user = library.add_new_user(
-                    first_name.strip(),
-                    last_name.strip(),
-                    is_admin=grant_admin,
-                    password=password.strip(),
-                )
-                storage_manager.save_users()
-                st.session_state.create_user_password = ""
-                queue_success_message(
-                    f"Created account **{new_user.username}** with password `{new_user.password}`.",
-                    "users",
-                )
-                st.rerun()
-            except ValueError as exc:
-                st.error(str(exc))
+            if not password.strip():
+                st.error("Password is required.")
+            else:
+                try:
+                    new_user = library.add_new_user(
+                        first_name.strip(),
+                        last_name.strip(),
+                        is_admin=grant_admin,
+                        password=password.strip(),
+                    )
+                    storage_manager.save_users()
+                    st.session_state.clear_create_user_password = True
+                    queue_success_message(
+                        f"Created account **{new_user.username}** with password `{new_user.password}`.",
+                        "users",
+                    )
+                    st.rerun()
+                except ValueError as exc:
+                    st.error(str(exc))
 
     with tab_override:
         normal_users = [
