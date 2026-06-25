@@ -16,8 +16,14 @@ class Library:
             return self.db[book_name]
         return None
 
-    def add_new_user(self, name: str, surname: str, is_admin: bool = False):
-        user = User(name, surname, is_admin=is_admin)
+    def add_new_user(
+        self,
+        name: str,
+        surname: str,
+        is_admin: bool = False,
+        password: str = None,
+    ):
+        user = User(name, surname, is_admin=is_admin, password=password)
         while user.username in self.users:
             user.username = user.username + str(random.randint(0, 9999))
         self.users[user.username] = user
