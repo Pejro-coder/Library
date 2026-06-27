@@ -72,6 +72,29 @@ def clear_tab_success_message(tab: str):
         st.session_state.pop("success_msg_displayed", None)
 
 
+def clear_user_form_state():
+    st.session_state.editing_user = None
+    st.session_state.form_first_name = ""
+    st.session_state.form_last_name = ""
+    st.session_state.create_user_password = ""
+    st.session_state.form_grant_admin = False
+    st.session_state.pop("user_form_error", None)
+
+
+def handle_edit_click(user: User):
+    st.session_state.editing_user = user.username
+    st.session_state.form_first_name = user.name
+    st.session_state.form_last_name = user.surname
+    st.session_state.create_user_password = user.password
+    st.session_state.form_grant_admin = user.is_admin
+
+
+def format_active_borrows(borrowed_books: dict) -> str:
+    if not borrowed_books:
+        return "—"
+    return ", ".join(f"{title} ({count})" for title, count in sorted(borrowed_books.items()))
+
+
 def show_login():
     st.title("Library System")
     st.subheader("Sign in to continue")
@@ -157,6 +180,58 @@ def show_user_dashboard():
                     st.error(message)
 
 
+def handle_user_form_submit():
+    library = st.session_state.library
+    storage_manager = st.session_state.storage_manager
+
+    first_name = st.session_state.get("form_first_name", "").strip()
+    last_name = st.session_state.get("form_last_name", "").strip()
+    password = st.session_state.get("create_user_password", "").strip()
+    grant_admin = st.session_state.get("form_grant_admin", False)
+    is_editing = st.session_state.editing_user is not None
+
+    clear_tab_success_message("users")
+
+    if not password:
+        st.session_state.user_form_error = "Password is required."
+        return
+
+    try:
+        if is_editing:
+            library.update_user(
+                st.session_state.editing_user,
+                first_name,
+                last_name,
+                password,
+                is_admin=grant_admin,
+            )
+            storage_manager.save_users()
+            refresh_current_user()
+            edited_username = st.session_state.editing_user
+            clear_user_form_state()
+            queue_success_message(
+                f"Updated account **{edited_username}**.",
+                "users",
+            )
+        else:
+            new_user = library.add_new_user(
+                first_name,
+                last_name,
+                is_admin=grant_admin,
+                password=password,
+            )
+            storage_manager.save_users()
+            clear_user_form_state()
+            queue_success_message(
+                f"Created account **{new_user.username}** with password `{new_user.password}`.",
+                "users",
+            )
+        if "user_form_error" in st.session_state:
+            del st.session_state.user_form_error
+    except ValueError as exc:
+        st.session_state.user_form_error = str(exc)
+
+
 def show_admin_dashboard():
     library = st.session_state.library
     storage_manager = st.session_state.storage_manager
@@ -185,22 +260,6 @@ def show_admin_dashboard():
             st.dataframe(book_rows, use_container_width=True, hide_index=True)
         else:
             st.info("No books in inventory.")
-
-        st.subheader("Registered Users")
-        if library.users:
-            user_rows = [
-                {
-                    "Name": user.name,
-                    "Surname": user.surname,
-                    "Username": user.username,
-                    "Role": "Admin" if user.is_admin else "Member",
-                    "Active Borrows": user.borrowed_books or "—",
-                }
-                for user in sorted(library.users.values(), key=lambda u: u.username)
-            ]
-            st.dataframe(user_rows, use_container_width=True, hide_index=True)
-        else:
-            st.info("No users registered.")
 
     with tab_stock:
         show_tab_success_message("stock")
@@ -275,66 +334,146 @@ def show_admin_dashboard():
             st.info("Add a book first before updating stock.")
 
     with tab_users:
+        st.markdown(
+            """
+            <style>
+            /* Keep your original red cancel button modifications */
+            .st-key-cancel_edit_user .stButton button {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+            }
+            .st-key-cancel_edit_user .stButton button:hover {
+                background-color: #bd2130;
+                color: white;
+                border: none;
+            }
+
+            /* ==================== THE TRUE FIX ==================== */
+
+            /* 1. Shrink the Edit buttons so they don't force a massive row height */
+            .st-key-user_table .stButton button {
+                padding: 4px 12px !important;
+                height: 28px !important;
+                min-height: 0px !important;
+                line-height: 1 !important;
+                transform: translateY(8px) !important;
+            }
+
+            /* 2. Vertically center the row items so text doesn't sit awkwardly at the top */
+            .st-key-user_table [data-testid="stHorizontalBlock"] {
+                align-items: center !important;
+            }
+
+            /* 3. Tighten the vertical layout gap between the row content and dividers */
+            div.st-key-user_table, 
+            [data-testid="stVerticalBlock"].st-key-user_table {
+                gap: 0.5rem !important;
+            }
+            
+            /* 4. Keep dividers perfectly snug against your newly thinned rows */
+            .st-key-user_table hr {
+                margin-top: 0.1rem !important;
+                margin-bottom: 0.1rem !important;
+            }
+
+            /* 5. Strip default paragraph spacing */
+            .st-key-user_table p {
+                margin-bottom: 0px !important;
+            }
+            /* ====================================================== */
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
         show_tab_success_message("users")
 
-        if st.session_state.pop("clear_create_user_password", False):
-            st.session_state.create_user_password = ""
-
+        if "editing_user" not in st.session_state:
+            st.session_state.editing_user = None
+        if "form_first_name" not in st.session_state:
+            st.session_state.form_first_name = ""
+        if "form_last_name" not in st.session_state:
+            st.session_state.form_last_name = ""
         if "create_user_password" not in st.session_state:
             st.session_state.create_user_password = ""
+        if "form_grant_admin" not in st.session_state:
+            st.session_state.form_grant_admin = False
 
-        if st.button("Auto-generate Password", key="auto_generate_password"):
-            st.session_state.create_user_password = generate_password()
-            st.rerun()
+        is_editing = st.session_state.editing_user is not None
+        form_title = "Edit Account" if is_editing else "Create New Account"
+        submit_label = "Save Changes" if is_editing else "Create Account"
+
+        st.markdown(f"#### {form_title}")
+
+        action_col1, action_col2 = st.columns([1, 1])
+        with action_col1:
+            if st.button("Auto-generate Password", key="auto_generate_password"):
+                st.session_state.create_user_password = generate_password()
+                st.rerun()
+        with action_col2:
+            if is_editing and st.button("Cancel Edit", key="cancel_edit_user"):
+                clear_user_form_state()
+                st.rerun()
 
         with st.form("create_user_form"):
-            first_name = st.text_input("First Name")
-            last_name = st.text_input("Last Name")
+            first_name = st.text_input("First Name", key="form_first_name")
+            last_name = st.text_input("Last Name", key="form_last_name")
             password = st.text_input(
                 "Password",
                 key="create_user_password",
                 help="Type a password or use Auto-generate above.",
             )
-            grant_admin = st.checkbox("Grant Administrator Permissions")
-            create_submitted = st.form_submit_button("Create Account")
+            grant_admin = st.checkbox(
+                "Grant Administrator Permissions",
+                key="form_grant_admin",
+            )
+            st.form_submit_button(submit_label, on_click=handle_user_form_submit)
 
-        if create_submitted:
-            clear_tab_success_message("users")
-            if not password.strip():
-                st.error("Password is required.")
-            else:
-                try:
-                    new_user = library.add_new_user(
-                        first_name.strip(),
-                        last_name.strip(),
-                        is_admin=grant_admin,
-                        password=password.strip(),
-                    )
-                    storage_manager.save_users()
-                    st.session_state.clear_create_user_password = True
-                    queue_success_message(
-                        f"Created account **{new_user.username}** with password `{new_user.password}`.",
-                        "users",
-                    )
-                    st.rerun()
-                except ValueError as exc:
-                    st.error(str(exc))
+        if "user_form_error" in st.session_state:
+            st.error(st.session_state.user_form_error)
 
         st.divider()
         st.subheader("Registered Users")
+
         if library.users:
-            user_rows = [
-                {
-                    "Name": user.name,
-                    "Surname": user.surname,
-                    "Username": user.username,
-                    "Password": user.password,
-                    "Role": "Admin" if user.is_admin else "Member",
-                    "Active Borrows": user.borrowed_books or "—",
-                }
-                for user in sorted(library.users.values(), key=lambda u: u.username)
-            ]
-            st.dataframe(user_rows, use_container_width=True, hide_index=True)
+            with st.container(key="user_table"):
+                row_weights = [1.2, 1.2, 1.4, 1.4, 0.9, 2.0, 0.7]
+                header_cols = st.columns(row_weights)
+                for col, label in zip(
+                    header_cols,
+                    ["Name", "Surname", "Username", "Password", "Role", "Active Borrows", ""],
+                ):
+                    col.markdown(f"**{label}**" if label else "")
+
+                st.divider()
+
+                sorted_users = sorted(library.users.values(), key=lambda u: u.username)
+                for user in sorted_users:
+                    is_editing_row = st.session_state.editing_user == user.username
+                    if is_editing_row:
+                        st.markdown(
+                            "<p style='margin: 0.25rem 0 0; color: #1f77b4; font-size: 0.85rem;'>"
+                            "✎ Currently editing this account"
+                            "</p>",
+                            unsafe_allow_html=True,
+                        )
+
+                    row_cols = st.columns(row_weights)
+                    row_cols[0].write(user.name)
+                    row_cols[1].write(user.surname)
+                    row_cols[2].write(user.username)
+                    row_cols[3].write(user.password)
+                    row_cols[4].write("Admin" if user.is_admin else "Member")
+                    row_cols[5].write(format_active_borrows(user.borrowed_books))
+                    row_cols[6].button(
+                        "Edit",
+                        key=f"edit_user_{user.username}",
+                        on_click=handle_edit_click,
+                        args=(user,),
+                    )
+
+                    st.divider()
         else:
             st.info("No users registered.")
 

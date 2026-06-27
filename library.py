@@ -92,3 +92,27 @@ class Library:
 
         self.db[book_name].count += book_amount
         return True, f"✅ {book_name} was successfully returned."
+
+    def update_user(
+        self,
+        username: str,
+        name: str,
+        surname: str,
+        password: str,
+        is_admin: bool = False,
+    ):
+        if username not in self.users:
+            raise ValueError("❌ User not found.")
+        if not name.isalpha():
+            raise ValueError("❌ Use only letters for name!")
+        if not surname.isalpha():
+            raise ValueError("❌ Use only letters for surname!")
+        if not password.strip():
+            raise ValueError("❌ Password is required.")
+
+        user = self.users[username]
+        user.name = name
+        user.surname = surname
+        user.password = password
+        user.is_admin = is_admin
+        return user

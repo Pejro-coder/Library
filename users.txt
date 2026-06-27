@@ -1,9 +1,10 @@
 System,Admin,admin,123,True,{}
-Gasper,Podergajs,gasperpodergajs,wkqUpRch,False,{"Misek Mali": 2, "Asko": 3}
-Peter,Stepanic,peterstepanic,CHr3xVcx,False,{}
+Gasper,Podergajs,gasperpodergajs,wkqUpRch,False,{"Misek Mali": 2, "Asko": 4, "Huda Muha": 1, "Jokcaaca": 1, "Nov Njiga Superca": 1, "Test": 1}
+Peter,Stepanic,peterstepanic,CHr3xVcx,False,{"Peter na pohodu": 1}
 Pero,En,peroen,12345,False,{}
-Pero,En,peroen2763,1234,False,{}
+Perooooooooooooo,En,peroen2763,1234,False,{}
 Miha,Dezelak,mihadezelak,oQZMRh1W,False,{}
 Miha,Veliki,mihaveliki,5VVMFCBB,False,{}
 Miha,En,mihaen,123,False,{}
 Miha,Enaaa,mihaenaaa,94KgUUqr,False,{}
+Miha,Sostaric,mihasostaric,123,False,{}
