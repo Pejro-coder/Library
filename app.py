@@ -320,6 +320,24 @@ def show_admin_dashboard():
                 except ValueError as exc:
                     st.error(str(exc))
 
+        st.divider()
+        st.subheader("Registered Users")
+        if library.users:
+            user_rows = [
+                {
+                    "Name": user.name,
+                    "Surname": user.surname,
+                    "Username": user.username,
+                    "Password": user.password,
+                    "Role": "Admin" if user.is_admin else "Member",
+                    "Active Borrows": user.borrowed_books or "—",
+                }
+                for user in sorted(library.users.values(), key=lambda u: u.username)
+            ]
+            st.dataframe(user_rows, use_container_width=True, hide_index=True)
+        else:
+            st.info("No users registered.")
+
     with tab_override:
         normal_users = [
             user for user in library.users.values() if not user.is_admin
