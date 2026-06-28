@@ -11,4 +11,4 @@ class Book:
         return f"📘 {self.title} by {self.author}. Stored books: {self.count}"
 
     def save_format(self):
-        return f"📘 {self.title} | {self.author} | {self.is_available}"
+        return f"📘 {self.title} | {self.author} | {self.count}"
