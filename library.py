@@ -30,7 +30,7 @@ class Library:
         return user
 
     # Used when adding a totally new book
-    def add_new_book(self, book_title: str, book_amount: int, book_author: str = None):
+    def add_new_book(self, book_title: str, book_amount: int, book_author: str):
         book_obj = Book(book_title, book_author, book_amount)
         self.db.update({book_title: book_obj})
 

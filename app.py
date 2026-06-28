@@ -133,7 +133,9 @@ def show_user_dashboard():
     library = st.session_state.library
 
     st.title("My Library")
-    tab_borrows, tab_circulation = st.tabs(["📚 My Active Borrows", "🔄 Book Circulation"])
+    tab_borrows, tab_circulation = st.tabs(
+        ["📚 My Active Borrows",
+         "🔄 Book Circulation"])
 
     with tab_borrows:
         if user.borrowed_books:
@@ -232,6 +234,60 @@ def handle_user_form_submit():
         st.session_state.user_form_error = str(exc)
 
 
+def update_stock_callback(title, delta):
+    library = st.session_state.library
+    storage_manager = st.session_state.storage_manager
+    library.update_book_amount(title, delta)
+    storage_manager.save_books()
+    st.session_state.stock_success = (
+        f"Added {delta} copy/copies of '{title}'."
+    )
+
+
+@st.fragment
+def render_update_existing_stock():
+    library = st.session_state.library
+
+    existing_titles = sorted(library.db.keys())
+    if not existing_titles:
+        st.info("Add a book first before updating stock.")
+        return
+
+    col1, col2, col3 = st.columns([3, 1, 1], vertical_alignment="bottom")
+    with col1:
+        selected_title = st.selectbox(
+            "Book",
+            existing_titles,
+            key="update_stock_title",
+        )
+    with col2:
+        current_count = library.get_available_copies(selected_title)
+        st.text_input(
+            "Current Stock",
+            value=str(current_count),
+            disabled=True,
+        )
+    with col3:
+        delta = st.number_input(
+            "Copies to Add",
+            min_value=1,
+            value=1,
+            key="update_stock_delta",
+        )
+
+    st.button(
+        "Update Stock",
+        key="update_stock_submit",
+        use_container_width=True,
+        on_click=update_stock_callback,
+        args=(selected_title, delta),
+    )
+
+    if st.session_state.get("stock_success"):
+        st.success(st.session_state.stock_success)
+        st.session_state.pop("stock_success", None)
+
+
 def show_admin_dashboard():
     library = st.session_state.library
     storage_manager = st.session_state.storage_manager
@@ -243,7 +299,9 @@ def show_admin_dashboard():
             "➕ Stock Management",
             "👤 User Management",
             "👑 Admin Override",
-        ]
+        ],
+        on_change="rerun",
+        key="main_navigation_tabs",
     )
 
     with tab_inventory:
@@ -298,6 +356,8 @@ def show_admin_dashboard():
             clear_tab_success_message("stock")
             if not new_title.strip():
                 st.error("Title is required.")
+            elif not new_author.strip():
+                st.error("Author is required.")
             elif library.book_in_storage(new_title.strip()):
                 st.error(f"'{new_title.strip()}' already exists. Use stock update instead.")
             else:
@@ -311,27 +371,8 @@ def show_admin_dashboard():
 
         st.divider()
         st.markdown("#### Update Existing Stock")
-        existing_titles = sorted(library.db.keys())
-        if existing_titles:
-            with st.form("update_stock_form"):
-                stock_col1, stock_col2 = st.columns(2)
-                with stock_col1:
-                    selected_title = st.selectbox("Book", existing_titles)
-                with stock_col2:
-                    delta = st.number_input("Copies to add", min_value=1, value=1)
-                update_submitted = st.form_submit_button("Update Stock")
-
-            if update_submitted:
-                clear_tab_success_message("stock")
-                library.update_book_amount(selected_title, delta)
-                storage_manager.save_books()
-                queue_success_message(
-                    f"Added {delta} copy/copies of '{selected_title}'.",
-                    "stock",
-                )
-                st.rerun()
-        else:
-            st.info("Add a book first before updating stock.")
+        with st.container(border=True):
+            render_update_existing_stock()
 
     with tab_users:
         st.markdown(
